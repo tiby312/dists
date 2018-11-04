@@ -1,3 +1,4 @@
+/*
 extern crate compt;
 extern crate piston_window;
 extern crate axgeom;
@@ -196,3 +197,4 @@ fn main() {
 
     }
 }
+*/
