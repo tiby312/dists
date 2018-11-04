@@ -2,6 +2,11 @@
 name = "dists"
 version = "0.1.0"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
+description = "2d distribution generator"
+license = "MIT/Apache-2.0"
+repository = "https://github.com/tiby312/dinodists"
+keywords = ["distribution"]
+readme = "readme.md"
 
 
 
