@@ -1,10 +1,10 @@
 [package]
-name = "dinodists"
-version = "0.1.1"
+name = "dists"
+version = "0.1.2"
 authors = ["Ken Reed <kenakioreed@gmail.com>"]
 description = "2d distribution generator"
 license = "MIT/Apache-2.0"
-repository = "https://github.com/tiby312/dinodists"
+repository = "https://github.com/tiby312/dists"
 keywords = ["distribution"]
 readme = "readme.md"
 edition = "2018"
