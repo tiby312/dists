@@ -4,10 +4,9 @@
 
 
 pub mod spiral{
-    use super::*;
+    
 
-
-    #[derive(Copy,Clone)]
+    #[derive(Clone)]
     pub struct Spiral{
         point:[f64;2],
         rad:f64,
