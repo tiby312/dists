@@ -15,6 +15,16 @@ pub mod spiral{
         width:f64
     }
 
+    pub struct SpiralInt(Spiral);
+    impl Iterator for SpiralInt{
+        type Item=[isize;2];
+        fn next(&mut self)->Option<[isize;2]>{
+            self.0.next().map(|[a,b]|[a as isize,b as isize])
+        }
+    }
+    impl std::iter::FusedIterator for SpiralInt{}
+
+
     impl Spiral{
         pub fn new(point:[f64;2],circular_grow:f64,outward_grow:f64)->Spiral{
             Spiral{point,rad:0.0,start:1.0,rate:outward_grow,width:circular_grow}
@@ -24,6 +34,9 @@ pub mod spiral{
         }
         pub fn get_outward_grow(&self)->f64{
             self.rate
+        }
+        pub fn as_isize(self)->SpiralInt{
+            SpiralInt(self)
         }
     }
     
