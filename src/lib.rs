@@ -24,6 +24,16 @@ pub mod spiral{
     }
     impl std::iter::FusedIterator for SpiralInt{}
 
+    pub struct SpiralF32(Spiral);
+    impl Iterator for SpiralF32{
+        type Item=[f32;2];
+        fn next(&mut self)->Option<[f32;2]>{
+            self.0.next().map(|[a,b]|[a as f32,b as f32])
+        }
+    }
+    impl std::iter::FusedIterator for SpiralF32{}
+
+
 
     impl Spiral{
         pub fn new(point:[f64;2],circular_grow:f64,outward_grow:f64)->Spiral{
@@ -37,6 +47,9 @@ pub mod spiral{
         }
         pub fn as_isize(self)->SpiralInt{
             SpiralInt(self)
+        }
+        pub fn as_f32(self)->SpiralF32{
+            SpiralF32(self)
         }
     }
     
