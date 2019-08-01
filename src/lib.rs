@@ -3,76 +3,44 @@
 //!
 
 
-pub mod spiral{
-    
+use cgmath::Vector2;
+use cgmath::vec2;
+use ordered_float::NotNan;
+use axgeom::Rect;
+use core::iter::FusedIterator;
+use rand::prelude::*;
 
-    #[derive(Clone)]
-    pub struct Spiral{
-        point:[f64;2],
-        rad:f64,
-        start:f64,
-        rate:f64,
-        width:f64
-    }
+pub mod spiral;
+pub mod uniform_rand;
 
-    pub struct SpiralInt(Spiral);
-    impl Iterator for SpiralInt{
-        type Item=[isize;2];
-        fn next(&mut self)->Option<[isize;2]>{
-            self.0.next().map(|[a,b]|[a as isize,b as isize])
-        }
-    }
-    impl std::iter::FusedIterator for SpiralInt{}
-
-    pub struct SpiralF32(Spiral);
-    impl Iterator for SpiralF32{
-        type Item=[f32;2];
-        fn next(&mut self)->Option<[f32;2]>{
-            self.0.next().map(|[a,b]|[a as f32,b as f32])
-        }
-    }
-    impl std::iter::FusedIterator for SpiralF32{}
+pub trait Dist2<K>:Iterator<Item=Vector2<K>>+FusedIterator{}
 
 
 
-    impl Spiral{
-        pub fn new(point:[f64;2],circular_grow:f64,outward_grow:f64)->Spiral{
-            Spiral{point,rad:0.0,start:1.0,rate:outward_grow,width:circular_grow}
-        }
-        pub fn get_circular_grow(&self)->f64{
-            self.width
-        }
-        pub fn get_outward_grow(&self)->f64{
-            self.rate
-        }
-        pub fn as_isize(self)->SpiralInt{
-            SpiralInt(self)
-        }
-        pub fn as_f32(self)->SpiralF32{
-            SpiralF32(self)
-        }
-    }
-    
-    impl std::iter::FusedIterator for Spiral{}
-
-    impl Iterator for Spiral{
-        type Item=[f64;2];
-        fn next(&mut self)->Option<[f64;2]>{
-            
-            let length=self.start+self.rate*self.rad;
-
-            let x=self.point[0]+self.rad.cos()*length;
-            let y=self.point[1]+self.rad.sin()*length;
-
-            self.rad+=self.width/length;
-
-            Some([x,y])
-
-        }
+pub struct RandomRectBuilder{
+    min:Vector2<f64>,
+    max:Vector2<f64>,
+    rng:ThreadRng
+}
+impl RandomRectBuilder{
+    pub fn new(min_radius:Vector2<f64>,max_radius:Vector2<f64>)->RandomRectBuilder{
+        let rng=rand::thread_rng();
+        RandomRectBuilder{min:min_radius,max:max_radius,rng}
     }
 
 }
+impl Iterator for RandomRectBuilder{
+    type Item=Vector2<f64>;
+    fn next(&mut self)->Option<Vector2<f64>>{
+        
+        let x=self.min.x+self.rng.gen::<f64>()*(self.max.x-self.min.x);
+        let y=self.min.y+self.rng.gen::<f64>()*(self.max.y-self.min.y);
 
+        //Rect::new(point.x-x,point.x+x,point.y-y,point.y+y)
+        Some(vec2(x,y))
+    }
+}
+impl FusedIterator for RandomRectBuilder{}
 
 
 //TODO add more distributions.
