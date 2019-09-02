@@ -1,12 +1,17 @@
-use cgmath::Vector2;
-use cgmath::vec2;
+
+
+
+use axgeom::Rect;
+use axgeom::Vec2;
+use axgeom::vec2;
+
 use axgeom;
 
 use crate::Dist2;
 use core::iter::FusedIterator;
-use axgeom::Rect;
+
 /*
-pub struct RangeGenIterf64{
+pub struct RangeGenIterf32{
     max:usize,
     counter:usize,
     rng:rand::StdRng,
@@ -17,11 +22,11 @@ pub struct RangeGenIterf64{
     velocity_mag:UniformRangeGenerator
 }
 
-pub struct Retf64{
+pub struct Retf32{
     pub id:usize,
-    pub pos:[f64;2],
-    pub vel:[f64;2],
-    pub radius:[f64;2],
+    pub pos:[f32;2],
+    pub vel:[f32;2],
+    pub radius:[f32;2],
 }
 
 pub struct RetInteger{
@@ -30,7 +35,7 @@ pub struct RetInteger{
     pub vel:[isize;2],
     pub radius:[isize;2],
 }
-impl Retf64{
+impl Retf32{
     pub fn into_isize(self)->RetInteger{
         let id=self.id;
         let pos=[self.pos[0] as isize,self.pos[1] as isize];
@@ -39,10 +44,10 @@ impl Retf64{
         RetInteger{id,pos,vel,radius}
     }
 }
-impl std::iter::FusedIterator for RangeGenIterf64{}
-impl ExactSizeIterator for RangeGenIterf64{}
-impl Iterator for RangeGenIterf64{
-    type Item=Retf64;
+impl std::iter::FusedIterator for RangeGenIterf32{}
+impl ExactSizeIterator for RangeGenIterf32{}
+impl Iterator for RangeGenIterf32{
+    type Item=Retf32;
     fn size_hint(&self)->(usize,Option<usize>){
         (self.max,Some(self.max))
     }
@@ -53,16 +58,16 @@ impl Iterator for RangeGenIterf64{
         }
 
         let rng=&mut self.rng;  
-        let px=self.xvaluegen.get(rng) as f64;
-        let py=self.yvaluegen.get(rng) as f64;
-        let rx=self.radiusgen.get(rng) as f64;
-        let ry=self.radiusgen.get(rng) as f64;
+        let px=self.xvaluegen.get(rng) as f32;
+        let py=self.yvaluegen.get(rng) as f32;
+        let rx=self.radiusgen.get(rng) as f32;
+        let ry=self.radiusgen.get(rng) as f32;
 
         let (velx,vely)={
-            let vel_dir=self.velocity_dir.get(rng) as f64;
+            let vel_dir=self.velocity_dir.get(rng) as f32;
             let vel_dir=vel_dir.to_radians();
             let (mut xval,mut yval)=(vel_dir.cos(),vel_dir.sin());
-            let vel_mag=self.velocity_mag.get(rng) as f64;
+            let vel_mag=self.velocity_mag.get(rng) as f32;
             xval*=vel_mag;
             yval*=vel_mag;
             (xval,yval)
@@ -70,11 +75,11 @@ impl Iterator for RangeGenIterf64{
 
         let curr=self.counter;
         self.counter+=1;
-        let r=Retf64{id:curr,pos:[px,py],vel:[velx,vely],radius:[rx,ry]};
+        let r=Retf32{id:curr,pos:[px,py],vel:[velx,vely],radius:[rx,ry]};
         Some(r)
     }
 }
-pub fn create_world_generator(num:usize,area:&[isize;4],radius:[isize;2],velocity:[isize;2])->RangeGenIterf64{
+pub fn create_world_generator(num:usize,area:&[isize;4],radius:[isize;2],velocity:[isize;2])->RangeGenIterf32{
     let arr:&[usize]=&[100,42,6];
     let rng =  SeedableRng::from_seed(arr);
 
@@ -87,45 +92,69 @@ pub fn create_world_generator(num:usize,area:&[isize;4],radius:[isize;2],velocit
     let velocity_dir=UniformRangeGenerator::new(0,360);
     let velocity_mag= UniformRangeGenerator::new(velocity[0],velocity[1]);
 
-    RangeGenIterf64{max:num,counter:0,rng,xvaluegen,yvaluegen,radiusgen,velocity_dir,velocity_mag}
+    RangeGenIterf32{max:num,counter:0,rng,xvaluegen,yvaluegen,radiusgen,velocity_dir,velocity_mag}
 }
 */
 
 use rand::prelude::*;
 
-pub struct UniformRangeBuilder{
-    area:Rect<f64>
+
+use crate::RadiusGen;
+use crate::RadiusGenInt;
+
+
+pub struct UniformRandGen{
+    area:Rect<f32>,
+    rng:ThreadRng
 }
-impl UniformRangeBuilder{
-    pub fn new(area:Rect<f64>)->UniformRangeBuilder{
-        UniformRangeBuilder{area}
-    }
-    pub fn with_seed(&mut self){
-        unimplemented!();
-    }
-    pub fn build(&self)->UniformRange{
+
+impl UniformRandGen{
+    pub fn new(area:Rect<f32>)->UniformRandGen{
         let rng=rand::thread_rng();
-        UniformRange{area:self.area,rng}
+        UniformRandGen{area,rng}
+    }
+    pub fn with_radius(self,min:f32,max:f32)->core::iter::Zip<UniformRandGen,RadiusGen>{
+        self.zip(RadiusGen::new(vec2(min,min),vec2(max,max)))
+    }
+
+    pub fn with_int(self)->UniformRandGenInt{
+        UniformRandGenInt(self)
     }
 }
 
-pub struct UniformRange{
-    area:Rect<f64>,
-    rng:ThreadRng
+pub struct UniformRandGenInt(UniformRandGen);
+impl UniformRandGenInt{
+    pub fn with_radius(self,min:i32,max:i32)->core::iter::Zip<UniformRandGenInt,RadiusGenInt>{
+        self.zip(RadiusGenInt::new(vec2(min,min),vec2(max,max)))
+    }
 }
-impl Iterator for UniformRange{
-    type Item=Vector2<f64>;
-    fn next(&mut self)->Option<Vector2<f64>>{
+
+impl Iterator for UniformRandGen{
+    type Item=Vec2<f32>;
+    fn next(&mut self)->Option<Vec2<f32>>{
         let rng = &mut self.rng;
         let area=&self.area;
-        let x: f64 = rng.gen::<f64>() * (area.x.right-area.x.left); // generates a float between 0 and 1
-        let y: f64 = rng.gen::<f64>() * (area.y.right-area.y.left);
+        let x: f32 = rng.gen::<f32>() * (area.x.right-area.x.left); // generates a float between 0 and 1
+        let y: f32 = rng.gen::<f32>() * (area.y.right-area.y.left);
         Some(vec2(x,y))
     }
 }
-impl FusedIterator for UniformRange{}
+impl FusedIterator for UniformRandGen{}
 
-impl Dist2<f64> for UniformRange{}
+impl Dist2<f32> for UniformRandGen{}
+
+
+
+impl Iterator for UniformRandGenInt{
+    type Item=Vec2<i32>;
+    fn next(&mut self)->Option<Vec2<i32>>{
+        self.0.next().map(|a|vec2(a.x as i32,a.y as i32))
+    }
+}
+impl FusedIterator for UniformRandGenInt{}
+
+impl Dist2<i32> for UniformRandGenInt{}
+
 
 
 

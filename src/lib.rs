@@ -2,45 +2,66 @@
 //! Provides a way to generate different 2d distributions of bots, such as a spiral, or a uniform random distribution.
 //!
 
-
-use cgmath::Vector2;
-use cgmath::vec2;
-use ordered_float::NotNan;
-use axgeom::Rect;
+use axgeom::Vec2;
+use axgeom::vec2;
 use core::iter::FusedIterator;
 use rand::prelude::*;
 
 pub mod spiral;
 pub mod uniform_rand;
 
-pub trait Dist2<K>:Iterator<Item=Vector2<K>>+FusedIterator{}
+pub trait Dist2<K>:Iterator<Item=Vec2<K>>+FusedIterator{
+
+}
 
 
 
-pub struct RandomRectBuilder{
-    min:Vector2<f64>,
-    max:Vector2<f64>,
+
+
+pub struct RadiusGen{
+    min:Vec2<f32>,
+    max:Vec2<f32>,
     rng:ThreadRng
 }
-impl RandomRectBuilder{
-    pub fn new(min_radius:Vector2<f64>,max_radius:Vector2<f64>)->RandomRectBuilder{
+impl RadiusGen{
+    pub fn new(min_radius:Vec2<f32>,max_radius:Vec2<f32>)->RadiusGen{
         let rng=rand::thread_rng();
-        RandomRectBuilder{min:min_radius,max:max_radius,rng}
+        RadiusGen{min:min_radius,max:max_radius,rng}
     }
 
 }
-impl Iterator for RandomRectBuilder{
-    type Item=Vector2<f64>;
-    fn next(&mut self)->Option<Vector2<f64>>{
+impl Iterator for RadiusGen{
+    type Item=Vec2<f32>;
+    fn next(&mut self)->Option<Vec2<f32>>{
         
-        let x=self.min.x+self.rng.gen::<f64>()*(self.max.x-self.min.x);
-        let y=self.min.y+self.rng.gen::<f64>()*(self.max.y-self.min.y);
+        let x=self.min.x+self.rng.gen::<f32>()*(self.max.x-self.min.x);
+        let y=self.min.y+self.rng.gen::<f32>()*(self.max.y-self.min.y);
 
         //Rect::new(point.x-x,point.x+x,point.y-y,point.y+y)
         Some(vec2(x,y))
     }
 }
-impl FusedIterator for RandomRectBuilder{}
+impl FusedIterator for RadiusGen{}
+
+
+
+pub struct RadiusGenInt(RadiusGen);
+impl RadiusGenInt{
+    pub fn new(min_radius:Vec2<i32>,max_radius:Vec2<i32>)->RadiusGenInt{
+        let rng=rand::thread_rng();
+        RadiusGenInt(RadiusGen{min:vec2(min_radius.x as f32,min_radius.y as f32),max:vec2(max_radius.x as f32,max_radius.y as f32),rng})
+    }
+
+}
+impl Iterator for RadiusGenInt{
+    type Item=Vec2<i32>;
+    fn next(&mut self)->Option<Vec2<i32>>{
+        self.0.next().map(|a|vec2(a.x as i32,a.y as i32))
+    }
+}
+impl FusedIterator for RadiusGenInt{}
+
+
 
 
 //TODO add more distributions.

@@ -10,5 +10,8 @@ readme = "readme.md"
 edition = "2018"
 
 
+[dependencies]
+rand = "0.7.0"
+axgeom = {path = "../axgeom"}
 
 [dev-dependencies]
