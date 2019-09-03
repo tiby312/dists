@@ -1,6 +1,5 @@
 
-use axgeom::Vec2;
-use axgeom::vec2;
+use axgeom::*;
 
 #[derive(Clone)]
 pub struct Spiral{
@@ -67,8 +66,8 @@ impl Iterator for Spiral{
     }
 }
 
-use crate::Dist2;
+use crate::Dist;
 
-impl Dist2<f32> for Spiral{}
-impl Dist2<f64> for SpiralF64{}
-impl Dist2<isize> for SpiralInt{}
+impl Dist<f32> for Spiral{}
+impl Dist<f64> for SpiralF64{}
+impl Dist<isize> for SpiralInt{}

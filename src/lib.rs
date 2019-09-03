@@ -2,22 +2,27 @@
 //! Provides a way to generate different 2d distributions of bots, such as a spiral, or a uniform random distribution.
 //!
 
-use axgeom::Vec2;
-use axgeom::vec2;
+use axgeom::*;
+
 use core::iter::FusedIterator;
 use rand::prelude::*;
 
+
+///Produces an archimedean spiral distribution
 pub mod spiral;
+
+
+///Produces a random distribution over a rectangular area
 pub mod uniform_rand;
 
-pub trait Dist2<K>:Iterator<Item=Vec2<K>>+FusedIterator{
 
-}
-
-
+///Every distribution implements this.
+pub trait Dist<K>:Iterator<Item=Vec2<K>>+FusedIterator{}
 
 
 
+
+///Randomly generates radiuses.
 pub struct RadiusGen{
     min:Vec2<f32>,
     max:Vec2<f32>,
@@ -33,18 +38,15 @@ impl RadiusGen{
 impl Iterator for RadiusGen{
     type Item=Vec2<f32>;
     fn next(&mut self)->Option<Vec2<f32>>{
-        
         let x=self.min.x+self.rng.gen::<f32>()*(self.max.x-self.min.x);
         let y=self.min.y+self.rng.gen::<f32>()*(self.max.y-self.min.y);
-
-        //Rect::new(point.x-x,point.x+x,point.y-y,point.y+y)
         Some(vec2(x,y))
     }
 }
 impl FusedIterator for RadiusGen{}
 
 
-
+///A wrapper around a RadiusGen that produced integers
 pub struct RadiusGenInt(RadiusGen);
 impl RadiusGenInt{
     pub fn new(min_radius:Vec2<i32>,max_radius:Vec2<i32>)->RadiusGenInt{
@@ -63,12 +65,92 @@ impl FusedIterator for RadiusGenInt{}
 
 
 
+///TODO
+pub mod mesh{
+    use super::*;
+
+    pub struct MeshGen{
+        topleft:Vec2<f32>,
+        dim:Vec2<isize>,
+        current:Vec2<isize>,
+        spacing:f32
+    }
+    impl Iterator for MeshGen{
+        type Item=Vec2<f32>;
+        fn next(&mut self)->Option<Self::Item>{
+            if self.current.x>=self.dim.x{
+                return None
+            }
+
+            if self.current.y>=self.dim.y{
+                self.current.y=0;
+                self.current.x+=1;
+            }
+
+            Some(self.topleft+self.current.inner_as()*self.spacing)
+        }
+    }
+    impl MeshGen{
+        pub fn new(num:usize,aspect_ratio:Vec2<isize>,topleft:Vec2<f32>,spacing:f32)->MeshGen{
+            let ff=aspect_ratio.x as f32/aspect_ratio.y as f32;
+
+            //x*y=num
+            //x/y=a
+            //solve for x and y
+
+            //y*a*y=num
+            //y*y=a*num
+            //y=sqrt(a*num);
+            //x=y*a
+
+            let numy=(ff*num as f32).sqrt();
+            let numx=ff*numy as f32;
+            let dim=vec2(numx,numy).inner_as();
+            /*
+            let mut poses:Vec<Vec2<f32>>;
+            for x in 0..numx{
+                let xpos=topleft.x+x*spacing;
+                for y in 0..numy{
+                    let ypos=topleft.y+y*spacing;
+                    poses.push(vec2(xpos,ypos));
+                }
+            }
+            */
+            MeshGen{topleft,spacing,dim,current:vec2same(0)}
+        }
+    }
+/*
+    #[test]
+    fn test_mesh() {
+        //in this test, tesselate a bunch of bots such that
+        //all of their edges are touching.
+        
+        let mut bots = Vec::new();
+        let mut id_counter = 0..;
+        for x in (-1000..2000).step_by(20) {
+            for y in (-100..200).step_by(20) {
+                let id = id_counter.next().unwrap();
+                //let rect = create_rect_from_point((x, y));
+                let rect =AABBox::new((x-10,x+10),(y-10,y+10));
+                    
+                bots.push(BBox::new(
+                    Bot {
+                        id,
+                        col: Vec::new(),
+                    },
+                    rect,
+                ));
+            }
+        }
+
+        test_bot_layout(bots);
+    }
+*/
+}
+
 
 //TODO add more distributions.
-
 /*
-
-
 fn test_bot_layout(mut bots: Vec<BBox<isize, Bot>>) {
     let mut control_result = {
         let mut src: Vec<(usize, usize)> = Vec::new();
@@ -244,7 +326,7 @@ fn test_bounding_boxes_as_points() {
 
 
 
-
+///TODO
 pub mod russian_doll{
     /*
 
@@ -281,35 +363,8 @@ pub mod russian_doll{
     */
 }
 
-pub mod mesh{
-/*
-    #[test]
-    fn test_mesh() {
-        //in this test, tesselate a bunch of bots such that
-        //all of their edges are touching.
-        
-        let mut bots = Vec::new();
-        let mut id_counter = 0..;
-        for x in (-1000..2000).step_by(20) {
-            for y in (-100..200).step_by(20) {
-                let id = id_counter.next().unwrap();
-                //let rect = create_rect_from_point((x, y));
-                let rect =AABBox::new((x-10,x+10),(y-10,y+10));
-                    
-                bots.push(BBox::new(
-                    Bot {
-                        id,
-                        col: Vec::new(),
-                    },
-                    rect,
-                ));
-            }
-        }
 
-        test_bot_layout(bots);
-    }
-*/
-}
+///TODO
 pub mod one_apart{
     /*
     #[test]
@@ -339,7 +394,7 @@ pub mod one_apart{
 
 }
 
-
+///TODO
 pub mod lattice{
     /*
     #[test]

@@ -7,7 +7,7 @@ use axgeom::vec2;
 
 use axgeom;
 
-use crate::Dist2;
+use crate::Dist;
 use core::iter::FusedIterator;
 
 /*
@@ -141,7 +141,7 @@ impl Iterator for UniformRandGen{
 }
 impl FusedIterator for UniformRandGen{}
 
-impl Dist2<f32> for UniformRandGen{}
+impl Dist<f32> for UniformRandGen{}
 
 
 
@@ -153,7 +153,7 @@ impl Iterator for UniformRandGenInt{
 }
 impl FusedIterator for UniformRandGenInt{}
 
-impl Dist2<i32> for UniformRandGenInt{}
+impl Dist<i32> for UniformRandGenInt{}
 
 
 
