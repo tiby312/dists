@@ -12,6 +12,6 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7.0"
-axgeom = "1.1.1"
+axgeom = "1.2.*"
 
 [dev-dependencies]
