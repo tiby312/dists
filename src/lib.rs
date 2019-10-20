@@ -8,6 +8,8 @@ use core::iter::FusedIterator;
 use rand::prelude::*;
 
 
+pub mod grid;
+
 ///Produces an archimedean spiral distribution
 pub mod spiral;
 
