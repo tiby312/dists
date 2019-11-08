@@ -1,8 +1,7 @@
 
 use axgeom::*;
 
-
-
+///Create a grid from a center point.
 pub fn from_center(start:Vec2<f32>,aspect_ratio:f32,spacing:f32,num:usize,mut func:impl FnMut(Vec2<f32>)){
 
     func(start);
@@ -60,6 +59,7 @@ pub fn from_center(start:Vec2<f32>,aspect_ratio:f32,spacing:f32,num:usize,mut fu
     }
 }
 
+///Create a grid from the top left point.
 pub fn from_top_left(start:Vec2<f32>,aspect_ratio:f32,spacing:f32,num:usize,mut func:impl FnMut(Vec2<f32>)){    
     
     func(start);
@@ -100,7 +100,8 @@ pub fn from_top_left(start:Vec2<f32>,aspect_ratio:f32,spacing:f32,num:usize,mut 
 
 
 
-
+///Create a grid where instead of specifying the spacing,
+///the user specifies the rectangle to fill.
 #[derive(Clone)]
 pub struct Grid{
     rect:Rect<f32>,
@@ -171,10 +172,5 @@ impl Iterator for Grid{
 
 
 
-use crate::*;
 
-
-
-
-
-impl Dist<f32> for Grid{}
+//impl Dist<f32> for Grid{}
