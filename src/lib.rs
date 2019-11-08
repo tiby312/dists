@@ -16,12 +16,10 @@ pub mod spiral;
 ///Produces a random distribution over a rectangular area
 pub mod uniform_rand;
 
-
 /*
 ///Every distribution implements this.
 pub trait Dist<K>:Iterator<Item=Vec2<K>>+FusedIterator{}
 */
-
 
 /*
 use core::marker::PhantomData;
@@ -57,55 +55,51 @@ impl<K:Add<Output=K>+Sub<Output=K>+Copy,I:Iterator<Item=Vec2<K>>> Iterator for C
 }
 */
 
-
-
-
-
-
-
 ///Randomly generates radiuses.
-pub struct RadiusGen{
-    min:Vec2<f32>,
-    max:Vec2<f32>,
-    rng:ThreadRng
+pub struct RadiusGen {
+    min: Vec2<f32>,
+    max: Vec2<f32>,
+    rng: ThreadRng,
 }
-impl RadiusGen{
-    pub fn new(min_radius:Vec2<f32>,max_radius:Vec2<f32>)->RadiusGen{
-        let rng=rand::thread_rng();
-        RadiusGen{min:min_radius,max:max_radius,rng}
-    }
-
-}
-impl Iterator for RadiusGen{
-    type Item=Vec2<f32>;
-    fn next(&mut self)->Option<Vec2<f32>>{
-        let x=self.min.x+self.rng.gen::<f32>()*(self.max.x-self.min.x);
-        let y=self.min.y+self.rng.gen::<f32>()*(self.max.y-self.min.y);
-        Some(vec2(x,y))
+impl RadiusGen {
+    pub fn new(min_radius: Vec2<f32>, max_radius: Vec2<f32>) -> RadiusGen {
+        let rng = rand::thread_rng();
+        RadiusGen {
+            min: min_radius,
+            max: max_radius,
+            rng,
+        }
     }
 }
-impl FusedIterator for RadiusGen{}
-
+impl Iterator for RadiusGen {
+    type Item = Vec2<f32>;
+    fn next(&mut self) -> Option<Vec2<f32>> {
+        let x = self.min.x + self.rng.gen::<f32>() * (self.max.x - self.min.x);
+        let y = self.min.y + self.rng.gen::<f32>() * (self.max.y - self.min.y);
+        Some(vec2(x, y))
+    }
+}
+impl FusedIterator for RadiusGen {}
 
 ///A wrapper around a RadiusGen that produced integers
 pub struct RadiusGenInt(RadiusGen);
-impl RadiusGenInt{
-    pub fn new(min_radius:Vec2<i32>,max_radius:Vec2<i32>)->RadiusGenInt{
-        let rng=rand::thread_rng();
-        RadiusGenInt(RadiusGen{min:vec2(min_radius.x as f32,min_radius.y as f32),max:vec2(max_radius.x as f32,max_radius.y as f32),rng})
-    }
-
-}
-impl Iterator for RadiusGenInt{
-    type Item=Vec2<i32>;
-    fn next(&mut self)->Option<Vec2<i32>>{
-        self.0.next().map(|a|vec2(a.x as i32,a.y as i32))
+impl RadiusGenInt {
+    pub fn new(min_radius: Vec2<i32>, max_radius: Vec2<i32>) -> RadiusGenInt {
+        let rng = rand::thread_rng();
+        RadiusGenInt(RadiusGen {
+            min: vec2(min_radius.x as f32, min_radius.y as f32),
+            max: vec2(max_radius.x as f32, max_radius.y as f32),
+            rng,
+        })
     }
 }
-impl FusedIterator for RadiusGenInt{}
-
-
-
+impl Iterator for RadiusGenInt {
+    type Item = Vec2<i32>;
+    fn next(&mut self) -> Option<Vec2<i32>> {
+        self.0.next().map(|a| vec2(a.x as i32, a.y as i32))
+    }
+}
+impl FusedIterator for RadiusGenInt {}
 
 //TODO add more distributions.
 /*
@@ -219,7 +213,7 @@ fn test_bot_layout(mut bots: Vec<BBox<isize, Bot>>) {
                 let second={
                   let dd=dyntree.0.get_iter_mut();
                   let ll=compt::LevelIter::new(dd,level);
-                  
+
                   let mut second=None;
                   'bla2:for (level,n) in ll.dfs_preorder_iter(){
                      for bot in n.range.iter(){
@@ -233,7 +227,7 @@ fn test_bot_layout(mut bots: Vec<BBox<isize, Bot>>) {
                 };
 
                 println!("debug={:?}",(first,second));
-     
+
                 let first_bot=bots_copy.iter().find(|a|a.get().1.id==i.0).unwrap();
                 let second_bot=bots_copy.iter().find(|a|a.get().1.id==i.1).unwrap();
                 println!("{:?}",(first_bot.get().0,second_bot.get().0));
@@ -246,13 +240,11 @@ fn test_bot_layout(mut bots: Vec<BBox<isize, Bot>>) {
 
 */
 
-
-
 /*
 
 #[test]
 fn test_bounding_boxes_as_points() {
-    
+
 
     let mut bots=create_bots_isize(|id|Bot{id,col:Vec::new()},&[0,800,0,800],500,[2,3]);
     /*
@@ -282,7 +274,6 @@ fn test_bounding_boxes_as_points() {
 }
 */
 
-
 /*
 ///TODO
 pub mod russian_doll{
@@ -292,7 +283,7 @@ pub mod russian_doll{
         fn test_russian_doll() {
             //In this test, test larger and larger rectangles overlapping each other.
 
-            
+
             let mut bots = Vec::new();
             let mut id_counter = 0..;
 
@@ -303,7 +294,7 @@ pub mod russian_doll{
 
                         //let rect = AABBox(make_rect((-1000, -100), (x, y)));
                         let rect =AABBox::new((-1000,-100),(y,x));
-                        
+
                         bots.push(BBox::new(
                             Bot {
                                 id,
@@ -327,7 +318,7 @@ pub mod one_apart{
     /*
     #[test]
     fn test_1_apart() {
-        
+
         let mut bots = Vec::new();
         let mut id_counter = 0..;
         for x in (-1000..2000).step_by(21) {
@@ -335,7 +326,7 @@ pub mod one_apart{
                 let id = id_counter.next().unwrap();
                 //let rect = create_rect_from_point((x, y));
                 let rect =AABBox::new((x-10,x+10),(y-10,y+10));
-                    
+
                 bots.push(BBox::new(
                     Bot {
                         id,
@@ -357,7 +348,7 @@ pub mod lattice{
     /*
     #[test]
     fn test_corners_touch() {
-        
+
         //# # # #
         // # # #
         //# # # #
@@ -382,7 +373,7 @@ pub mod lattice{
                     let id = id_counter.next().unwrap();
                     //let rect = create_rect_from_point((x, y));
                     let rect =AABBox::new((x-10,x+10),(y-10,y+10));
-                    
+
                     bots.push(BBox::new(
                         Bot {
                             id,

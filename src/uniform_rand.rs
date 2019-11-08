@@ -1,9 +1,6 @@
-
-
-
+use axgeom::vec2;
 use axgeom::Rect;
 use axgeom::Vec2;
-use axgeom::vec2;
 
 use axgeom;
 
@@ -50,13 +47,13 @@ impl Iterator for RangeGenIterf32{
     fn size_hint(&self)->(usize,Option<usize>){
         (self.max,Some(self.max))
     }
-    fn next(&mut self)->Option<Self::Item>{  
+    fn next(&mut self)->Option<Self::Item>{
 
         if self.counter==self.max{
             return None
         }
 
-        let rng=&mut self.rng;  
+        let rng=&mut self.rng;
         let px=self.xvaluegen.get(rng) as f32;
         let py=self.yvaluegen.get(rng) as f32;
         let rx=self.radiusgen.get(rng) as f32;
@@ -97,69 +94,62 @@ pub fn create_world_generator(num:usize,area:&[isize;4],radius:[isize;2],velocit
 
 use rand::prelude::*;
 
-
 use crate::RadiusGen;
 use crate::RadiusGenInt;
 
-
-pub struct UniformRandGen{
-    area:Rect<f32>,
-    rng:ThreadRng
+pub struct UniformRandGen {
+    area: Rect<f32>,
+    rng: ThreadRng,
 }
 
-impl UniformRandGen{
-    pub fn new(area:Rect<f32>)->UniformRandGen{
-        let rng=rand::thread_rng();
-        UniformRandGen{area,rng}
+impl UniformRandGen {
+    pub fn new(area: Rect<f32>) -> UniformRandGen {
+        let rng = rand::thread_rng();
+        UniformRandGen { area, rng }
     }
-    pub fn with_radius(self,min:f32,max:f32)->core::iter::Zip<UniformRandGen,RadiusGen>{
-        self.zip(RadiusGen::new(vec2(min,min),vec2(max,max)))
+    pub fn with_radius(self, min: f32, max: f32) -> core::iter::Zip<UniformRandGen, RadiusGen> {
+        self.zip(RadiusGen::new(vec2(min, min), vec2(max, max)))
     }
 
-    pub fn with_int(self)->UniformRandGenInt{
+    pub fn with_int(self) -> UniformRandGenInt {
         UniformRandGenInt(self)
     }
 }
 
 pub struct UniformRandGenInt(UniformRandGen);
-impl UniformRandGenInt{
-    pub fn with_radius(self,min:i32,max:i32)->core::iter::Zip<UniformRandGenInt,RadiusGenInt>{
-        self.zip(RadiusGenInt::new(vec2(min,min),vec2(max,max)))
+impl UniformRandGenInt {
+    pub fn with_radius(
+        self,
+        min: i32,
+        max: i32,
+    ) -> core::iter::Zip<UniformRandGenInt, RadiusGenInt> {
+        self.zip(RadiusGenInt::new(vec2(min, min), vec2(max, max)))
     }
 }
 
-impl Iterator for UniformRandGen{
-    type Item=Vec2<f32>;
-    fn next(&mut self)->Option<Vec2<f32>>{
+impl Iterator for UniformRandGen {
+    type Item = Vec2<f32>;
+    fn next(&mut self) -> Option<Vec2<f32>> {
         let rng = &mut self.rng;
-        let area=&self.area;
-        let x: f32 = rng.gen::<f32>() * (area.x.right-area.x.left); // generates a float between 0 and 1
-        let y: f32 = rng.gen::<f32>() * (area.y.right-area.y.left);
-        Some(vec2(x,y))
+        let area = &self.area;
+        let x: f32 = rng.gen::<f32>() * (area.x.right - area.x.left); // generates a float between 0 and 1
+        let y: f32 = rng.gen::<f32>() * (area.y.right - area.y.left);
+        Some(vec2(x, y))
     }
 }
-impl FusedIterator for UniformRandGen{}
+impl FusedIterator for UniformRandGen {}
 
 //impl Dist<f32> for UniformRandGen{}
 
-
-
-impl Iterator for UniformRandGenInt{
-    type Item=Vec2<i32>;
-    fn next(&mut self)->Option<Vec2<i32>>{
-        self.0.next().map(|a|vec2(a.x as i32,a.y as i32))
+impl Iterator for UniformRandGenInt {
+    type Item = Vec2<i32>;
+    fn next(&mut self) -> Option<Vec2<i32>> {
+        self.0.next().map(|a| vec2(a.x as i32, a.y as i32))
     }
 }
-impl FusedIterator for UniformRandGenInt{}
+impl FusedIterator for UniformRandGenInt {}
 
 //impl Dist<i32> for UniformRandGenInt{}
-
-
-
-
-
-
-
 
 /*
 
