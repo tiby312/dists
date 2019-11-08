@@ -12,9 +12,9 @@ pub struct Spiral{
 
 pub struct SpiralInt(Spiral);
 impl Iterator for SpiralInt{
-    type Item=Vec2<isize>;
-    fn next(&mut self)->Option<Vec2<isize>>{
-        self.0.next().map(|a|vec2(a.x as isize,a.y as isize))
+    type Item=Vec2<i32>;
+    fn next(&mut self)->Option<Vec2<i32>>{
+        self.0.next().map(|a|a.inner_as())
     }
 }
 impl std::iter::FusedIterator for SpiralInt{}
@@ -66,8 +66,3 @@ impl Iterator for Spiral{
     }
 }
 
-use crate::Dist;
-
-impl Dist<f32> for Spiral{}
-impl Dist<f64> for SpiralF64{}
-impl Dist<isize> for SpiralInt{}

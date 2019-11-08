@@ -2,23 +2,6 @@
 use axgeom::*;
 
 
-/*
-pub struct Grid2{
-    test:Box<dyn Generator<Yield=Vec2<f32>,Return=()>+Unpin>
-}
-
-impl Iterator for Grid2{
-    type Item=Vec2<f32>;
-    fn next(&mut self)->Option<Self::Item>{
-        match self.test.resume(){
-            GeneratorState::Yielded(a) => {
-                Some(a)
-            },
-            _ => panic!("unexpected value from resume"),
-        }
-    }
-}
-*/
 
 pub fn from_center(start:Vec2<f32>,aspect_ratio:f32,spacing:f32,num:usize,mut func:impl FnMut(Vec2<f32>)){
 
@@ -185,6 +168,13 @@ impl Iterator for Grid{
     }
 }
 
-use crate::Dist;
+
+
+
+use crate::*;
+
+
+
+
 
 impl Dist<f32> for Grid{}

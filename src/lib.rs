@@ -24,6 +24,44 @@ pub trait Dist<K>:Iterator<Item=Vec2<K>>+FusedIterator{}
 
 
 
+use core::marker::PhantomData;
+pub struct ConstantAabbAdapter<K,I>{
+    a:I,
+    _p:PhantomData<K>,
+    radius:K
+}
+
+impl<K,I> ConstantAabbAdapter<K,I>{
+    pub fn new(radius:K,a:I)->Self{
+        ConstantAabbAdapter{a,radius,_p:PhantomData}
+    }
+}
+
+impl<K:Clone,I:Clone> Clone for ConstantAabbAdapter<K,I>{
+    fn clone(&self)->Self{
+        ConstantAabbAdapter::new(self.radius.clone(),self.a.clone())
+    }
+}
+
+use core::ops::*;
+
+impl<K:Add<Output=K>+Sub<Output=K>+Copy,I:Iterator<Item=Vec2<K>>> Iterator for ConstantAabbAdapter<K,I>{
+    type Item=Rect<K>;
+    fn next(&mut self)->Option<Self::Item>{
+        self.a.next().map(|a|{
+            let r=self.radius;
+            Rect::new(a.x-r,a.x+r,a.y-r,a.y+r)
+        })
+    }
+}
+
+
+
+
+
+
+
+
 ///Randomly generates radiuses.
 pub struct RadiusGen{
     min:Vec2<f32>,
