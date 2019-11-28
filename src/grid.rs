@@ -15,21 +15,21 @@ pub fn from_center(
     let mut grow_down = vec2same(true);
 
     loop {
-        let dim = vec2(rect.x.right - rect.x.left, rect.y.right - rect.y.left);
+        let dim = vec2(rect.x.end - rect.x.start, rect.y.end - rect.y.start);
         let curr_aspect_ratio = dim.x as f32 / dim.y as f32;
 
         //if to wide
         if curr_aspect_ratio > aspect_ratio {
             let p = if grow_down.y {
-                rect.y.right += 1;
-                rect.y.right
+                rect.y.end += 1;
+                rect.y.end
             } else {
-                rect.y.left -= 1;
-                rect.y.left
+                rect.y.start -= 1;
+                rect.y.start
             };
 
             //add a row at the bottom
-            for x in rect.x.left..rect.x.right {
+            for x in rect.x.start..rect.x.end {
                 if counter == num {
                     return;
                 }
@@ -40,15 +40,15 @@ pub fn from_center(
             grow_down.y = !grow_down.y;
         } else {
             let p = if grow_down.x {
-                rect.x.right += 1;
-                rect.x.right
+                rect.x.end += 1;
+                rect.x.end
             } else {
-                rect.x.left -= 1;
-                rect.x.left
+                rect.x.start -= 1;
+                rect.x.start
             };
 
-            //add a colum on the right
-            for y in rect.y.left..rect.y.right {
+            //add a colum on the end
+            for y in rect.y.start..rect.y.end {
                 if counter == num {
                     return;
                 }
@@ -61,8 +61,8 @@ pub fn from_center(
     }
 }
 
-///Create a grid from the top left point.
-pub fn from_top_left(
+///Create a grid from the top start point.
+pub fn from_top_start(
     start: Vec2<f32>,
     aspect_ratio: f32,
     spacing: f32,
@@ -89,7 +89,7 @@ pub fn from_top_left(
             }
             dim.y += 1;
         } else {
-            //add a colum on the right
+            //add a colum on the end
             for y in 0..dim.y {
                 if counter == num {
                     return;
@@ -115,8 +115,8 @@ pub struct Grid {
 
 impl Grid {
     pub fn new(rect: Rect<f32>, num_bots: usize) -> Grid {
-        let width = rect.x.right - rect.x.left;
-        let height = rect.y.right - rect.y.left;
+        let width = rect.x.end - rect.x.start;
+        let height = rect.y.end - rect.y.start;
 
         let aspect_ratio = width / height;
 
@@ -150,13 +150,13 @@ impl std::iter::FusedIterator for Grid {}
 impl Iterator for Grid {
     type Item = Vec2<f32>;
     fn next(&mut self) -> Option<Vec2<f32>> {
-        let topleft = vec2(self.rect.x.left, self.rect.y.left);
+        let topstart = vec2(self.rect.x.start, self.rect.y.start);
 
         let kk = vec2(
             self.cursor.x as f32 * self.spacing.x,
             self.cursor.y as f32 * self.spacing.y,
         );
-        let ans = topleft + kk;
+        let ans = topstart + kk;
 
         //increment
         if self.cursor.x < self.grid_dim.x {

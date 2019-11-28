@@ -132,8 +132,8 @@ impl Iterator for UniformRandGen {
     fn next(&mut self) -> Option<Vec2<f32>> {
         let rng = &mut self.rng;
         let area = &self.area;
-        let x: f32 = rng.gen::<f32>() * (area.x.right - area.x.left); // generates a float between 0 and 1
-        let y: f32 = rng.gen::<f32>() * (area.y.right - area.y.left);
+        let x: f32 = rng.gen::<f32>() * (area.x.end - area.x.start); // generates a float between 0 and 1
+        let y: f32 = rng.gen::<f32>() * (area.y.end - area.y.start);
         Some(vec2(x, y))
     }
 }
