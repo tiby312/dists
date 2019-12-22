@@ -62,26 +62,29 @@ pub fn from_center(
 }
 
 ///Create a grid from the top start point.
-pub fn from_top_start(
+pub fn from_top_left(
     start: Vec2<f32>,
-    aspect_ratio: f32,
+    aspect_ratio: axgeom::AspectRatio,
     spacing: f32,
     num: usize,
     mut func: impl FnMut(Vec2<f32>),
-) {
+) ->Vec2<f32>{
+    let start=start+vec2same(spacing);
     func(start);
     let mut dim = vec2same(1);
 
+
     let mut counter = 1;
-    loop {
-        let curr_aspect_ratio = dim.x as f32 / dim.y as f32;
+    'outer: loop {
+        let curr_aspect_ratio = dim.x as f64 / dim.y as f64;
         //dbg!(curr_aspect_ratio);
         //if to wide
-        if curr_aspect_ratio > aspect_ratio {
+        if curr_aspect_ratio > aspect_ratio.width_over_height() {
             //add a row at the bottom
             for x in 0..dim.x {
                 if counter == num {
-                    return;
+                    break 'outer;
+                    //return;
                 }
                 let v = vec2(x, dim.y + 1);
                 func(start + (v.inner_as::<f32>() * spacing));
@@ -92,7 +95,8 @@ pub fn from_top_start(
             //add a colum on the end
             for y in 0..dim.y {
                 if counter == num {
-                    return;
+                    break 'outer;
+                    //return;
                 }
                 let v = vec2(dim.x + 1, y);
                 func(start + (v.inner_as::<f32>() * spacing));
@@ -101,6 +105,8 @@ pub fn from_top_start(
             dim.x += 1;
         }
     }
+
+    dim.inner_as() * spacing
 }
 
 ///Create a grid where instead of specifying the spacing,
