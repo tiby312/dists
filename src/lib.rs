@@ -1,3 +1,4 @@
+
 //!
 //! Provides a way to generate different 2d distributions of bots, such as a spiral, or a uniform random distribution.
 //!
@@ -15,6 +16,50 @@ pub mod spiral;
 
 ///Produces a random distribution over a rectangular area
 pub mod uniform_rand;
+
+
+//TODO use
+pub fn grid_iter(dim:[usize;2])->impl Iterator<Item=[usize;2]>+Clone{
+    let mut xcounter=0;
+    let mut ycounter=0;
+    core::iter::from_fn(move ||{
+        if ycounter>=dim[1]{
+            None
+        }else{
+            if xcounter>=dim[0]{
+                xcounter=0;
+                ycounter+=1;
+            }
+        
+            
+            let c=[xcounter,ycounter];
+
+            xcounter+=1;
+
+            Some(c)
+        }
+    })
+}
+
+pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Iterator<Item=[f64;2]>{
+    let start=1.0;
+    let rate=outward_grow;
+    let mut rad=0.0;
+    let width=circular_grow;
+    
+    core::iter::repeat_with(move||{
+        let length = start + rate * rad;
+
+        let x = point[0] + rad.cos() * length;
+        let y = point[1] + rad.sin() * length;
+
+        rad += width / length;
+
+        [x,y]
+    })
+}
+
+
 
 /*
 ///Every distribution implements this.
@@ -55,6 +100,23 @@ impl<K:Add<Output=K>+Sub<Output=K>+Copy,I:Iterator<Item=Vec2<K>>> Iterator for C
 }
 */
 
+
+pub fn rand2_iter(rect:Rect<f32>)->impl Iterator<Item=[f32;2]>{
+    rand_iter(rect.x.start,rect.x.end)
+    .zip(rand_iter(rect.y.start,rect.y.end))
+    .map(|(x,y)|[x,y])
+}
+
+pub fn rand_iter(min:f32,max:f32)->impl Iterator<Item=f32>{
+    let mut rng=rand::thread_rng();
+
+    core::iter::repeat_with(move ||{
+        min+rng.gen::<f32>()*(max-min)
+    })
+}
+
+
+
 ///Randomly generates radiuses.
 pub struct RadiusGen {
     min: Vec2<f32>,
@@ -62,6 +124,10 @@ pub struct RadiusGen {
     rng: ThreadRng,
 }
 impl RadiusGen {
+    #[deprecated(
+        since = "0.3.1",
+        note = "use rand_iter() instead"
+    )]
     pub fn new(min_radius: Vec2<f32>, max_radius: Vec2<f32>) -> RadiusGen {
         let rng = rand::thread_rng();
         RadiusGen {

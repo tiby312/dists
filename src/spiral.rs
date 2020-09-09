@@ -28,6 +28,10 @@ impl Iterator for SpiralF64 {
 impl std::iter::FusedIterator for SpiralF64 {}
 
 impl Spiral {
+    #[deprecated(
+        since = "0.3.1",
+        note = "use spiral_iter() instead"
+    )]
     pub fn new(point: [f32; 2], circular_grow: f32, outward_grow: f32) -> Spiral {
         Spiral {
             point,

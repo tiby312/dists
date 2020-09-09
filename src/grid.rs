@@ -1,6 +1,10 @@
 use axgeom::*;
 
 ///Create a grid from a center point.
+#[deprecated(
+    since = "0.3.1",
+    note = "use grid_iter() instead"
+)]
 pub fn from_center(
     start: Vec2<f32>,
     aspect_ratio: f32,
@@ -62,6 +66,10 @@ pub fn from_center(
 }
 
 ///Create a grid from the top start point.
+#[deprecated(
+    since = "0.3.1",
+    note = "use grid_iter() instead"
+)]
 pub fn from_top_left(
     start: Vec2<f32>,
     aspect_ratio: axgeom::AspectRatio,
