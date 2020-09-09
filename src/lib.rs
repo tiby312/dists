@@ -41,7 +41,7 @@ pub fn grid_iter(dim:[usize;2])->impl Iterator<Item=[usize;2]>+Clone{
     })
 }
 
-pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Iterator<Item=[f64;2]>{
+pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Iterator<Item=[f64;2]>+Clone+FusedIterator{
     let start=1.0;
     let rate=outward_grow;
     let mut rad=0.0;
@@ -101,13 +101,13 @@ impl<K:Add<Output=K>+Sub<Output=K>+Copy,I:Iterator<Item=Vec2<K>>> Iterator for C
 */
 
 
-pub fn rand2_iter(rect:Rect<f32>)->impl Iterator<Item=[f32;2]>{
+pub fn rand2_iter(rect:Rect<f32>)->impl Iterator<Item=[f32;2]>+FusedIterator+Clone{
     rand_iter(rect.x.start,rect.x.end)
     .zip(rand_iter(rect.y.start,rect.y.end))
     .map(|(x,y)|[x,y])
 }
 
-pub fn rand_iter(min:f32,max:f32)->impl Iterator<Item=f32>{
+pub fn rand_iter(min:f32,max:f32)->impl Iterator<Item=f32>+FusedIterator+Clone{
     let mut rng=rand::thread_rng();
 
     core::iter::repeat_with(move ||{
