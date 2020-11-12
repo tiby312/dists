@@ -12,6 +12,6 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7.0"
-axgeom = "1.2"
+axgeom = {version="1.7",default-features=false}
 
 [dev-dependencies]
