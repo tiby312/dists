@@ -41,6 +41,29 @@ pub fn grid_iter(dim:[usize;2])->impl Iterator<Item=[usize;2]>+Clone{
     })
 }
 
+
+pub fn fib_iter(point:[f64;2],out_incr:f64)->impl Iterator<Item=[f64;2]>{
+    
+    const PHI:f64=1.6180339887498948482;
+
+    //
+    //     x        PHI
+    //  -----   =  -----
+    //   TAU         1
+    //
+    //const INCR:f64=PHI*std::f64::consts::TAU;
+
+    let mut counter=0;
+    core::iter::repeat_with(move||{
+        let l=out_incr*(counter as f64).sqrt();
+        let rad=(std::f64::consts::TAU/(PHI*PHI))*(counter as f64);
+        let x = point[0] + (rad.cos() * l);
+        let y = point[1] + (rad.sin() * l);
+        counter+=1;
+        [x,y]
+    })
+}
+
 pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Iterator<Item=[f64;2]>+Clone+FusedIterator{
     let start=1.0;
     let rate=outward_grow;
