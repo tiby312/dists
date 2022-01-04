@@ -1,10 +1,7 @@
 use axgeom::*;
 
 ///Create a grid from a center point.
-#[deprecated(
-    since = "0.3.1",
-    note = "use grid_iter() instead"
-)]
+#[deprecated(since = "0.3.1", note = "use grid_iter() instead")]
 pub fn from_center(
     start: Vec2<f32>,
     aspect_ratio: f32,
@@ -64,7 +61,6 @@ pub fn from_center(
         }
     }
 }
-
 
 ///Create a grid where instead of specifying the spacing,
 ///the user specifies the rectangle to fill.

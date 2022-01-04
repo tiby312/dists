@@ -104,18 +104,12 @@ pub struct UniformRandGen {
 }
 
 impl UniformRandGen {
-    #[deprecated(
-        since = "0.3.1",
-        note = "use rand_iter() instead"
-    )]
+    #[deprecated(since = "0.3.1", note = "use rand_iter() instead")]
     pub fn new(area: Rect<f32>) -> UniformRandGen {
         let rng = rand::thread_rng();
         UniformRandGen { area, rng }
     }
-    #[deprecated(
-        since = "0.3.1",
-        note = "use rand_iter() instead"
-    )]
+    #[deprecated(since = "0.3.1", note = "use rand_iter() instead")]
     pub fn with_radius(self, min: f32, max: f32) -> core::iter::Zip<UniformRandGen, RadiusGen> {
         self.zip(RadiusGen::new(vec2(min, min), vec2(max, max)))
     }
@@ -125,15 +119,9 @@ impl UniformRandGen {
     }
 }
 
-
-
-
 pub struct UniformRandGenInt(UniformRandGen);
 impl UniformRandGenInt {
-    #[deprecated(
-        since = "0.3.1",
-        note = "use rand_iter() instead"
-    )]
+    #[deprecated(since = "0.3.1", note = "use rand_iter() instead")]
     pub fn with_radius(
         self,
         min: i32,

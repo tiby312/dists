@@ -1,4 +1,3 @@
-
 //!
 //! Provides a way to generate different 2d distributions of bots, such as a spiral, or a uniform random distribution.
 //!
@@ -17,34 +16,61 @@ pub mod spiral;
 ///Produces a random distribution over a rectangular area
 pub mod uniform_rand;
 
+pub fn grid_rect_iter(
+    num_bots: usize,
+    rect: Rect<f32>,
+) -> impl Iterator<Item = [f32; 2]> + Clone + Send + Sync {
+    let width = rect.x.end - rect.x.start;
+    let height = rect.y.end - rect.y.start;
+
+    let aspect_ratio = width / height;
+
+    //w*h=num_bots
+    //w/h=width/height
+    //solve for sx and sy
+
+    //w=num_bots/h
+    //num_bots/h^2=width/height
+    //h^2=num_bots/(width/height);
+    //h=sqrt(num_bots/(width/height));
+
+    let h = (num_bots as f32 / aspect_ratio).sqrt().ceil() as usize;
+    let w = num_bots / h;
+
+    let grid_dim = [w, h];
+    let spacing = vec2(width / w as f32, height / h as f32);
+
+    let topstart = vec2(rect.x.start, rect.y.start);
+    grid_iter(grid_dim).map(move |[x, y]| {
+        let v = topstart + vec2(x, y).inner_as().scale(spacing);
+        [v.x, v.y]
+    })
+}
 
 //TODO use
-pub fn grid_iter(dim:[usize;2])->impl Iterator<Item=[usize;2]>+Clone{
-    let mut xcounter=0;
-    let mut ycounter=0;
-    core::iter::from_fn(move ||{
-        if ycounter>=dim[1]{
+pub fn grid_iter(dim: [usize; 2]) -> impl Iterator<Item = [usize; 2]> + Clone + Send + Sync {
+    let mut xcounter = 0;
+    let mut ycounter = 0;
+    core::iter::from_fn(move || {
+        if ycounter >= dim[1] {
             None
-        }else{
-            if xcounter>=dim[0]{
-                xcounter=0;
-                ycounter+=1;
+        } else {
+            if xcounter >= dim[0] {
+                xcounter = 0;
+                ycounter += 1;
             }
-        
-            
-            let c=[xcounter,ycounter];
 
-            xcounter+=1;
+            let c = [xcounter, ycounter];
+
+            xcounter += 1;
 
             Some(c)
         }
     })
 }
 
-
-pub fn fib_iter(point:[f64;2],out_incr:f64)->impl Iterator<Item=[f64;2]>{
-    
-    const PHI:f64=1.6180339887498948482;
+pub fn fib_iter(point: [f64; 2], out_incr: f64) -> impl Iterator<Item = [f64; 2]> {
+    const PHI: f64 = 1.6180339887498948482;
 
     //
     //     x        PHI
@@ -53,24 +79,28 @@ pub fn fib_iter(point:[f64;2],out_incr:f64)->impl Iterator<Item=[f64;2]>{
     //
     //const INCR:f64=PHI*std::f64::consts::TAU;
 
-    let mut counter=0;
-    core::iter::repeat_with(move||{
-        let l=out_incr*(counter as f64).sqrt();
-        let rad=(std::f64::consts::TAU/(PHI*PHI))*(counter as f64);
+    let mut counter = 0;
+    core::iter::repeat_with(move || {
+        let l = out_incr * (counter as f64).sqrt();
+        let rad = (std::f64::consts::TAU / (PHI * PHI)) * (counter as f64);
         let x = point[0] + (rad.cos() * l);
         let y = point[1] + (rad.sin() * l);
-        counter+=1;
-        [x,y]
+        counter += 1;
+        [x, y]
     })
 }
 
-pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Iterator<Item=[f64;2]>+Clone+FusedIterator{
-    let start=1.0;
-    let rate=outward_grow;
-    let mut rad=0.0;
-    let width=circular_grow;
-    
-    core::iter::repeat_with(move||{
+pub fn spiral_iter(
+    point: [f64; 2],
+    circular_grow: f64,
+    outward_grow: f64,
+) -> impl Iterator<Item = [f64; 2]> + Clone + FusedIterator {
+    let start = 1.0;
+    let rate = outward_grow;
+    let mut rad = 0.0;
+    let width = circular_grow;
+
+    core::iter::repeat_with(move || {
         let length = start + rate * rad;
 
         let x = point[0] + rad.cos() * length;
@@ -78,11 +108,9 @@ pub fn spiral_iter(point:[f64;2],circular_grow:f64,outward_grow:f64)->impl Itera
 
         rad += width / length;
 
-        [x,y]
+        [x, y]
     })
 }
-
-
 
 /*
 ///Every distribution implements this.
@@ -123,22 +151,17 @@ impl<K:Add<Output=K>+Sub<Output=K>+Copy,I:Iterator<Item=Vec2<K>>> Iterator for C
 }
 */
 
-
-pub fn rand2_iter(rect:Rect<f32>)->impl Iterator<Item=[f32;2]>+FusedIterator+Clone{
-    rand_iter(rect.x.start,rect.x.end)
-    .zip(rand_iter(rect.y.start,rect.y.end))
-    .map(|(x,y)|[x,y])
+pub fn rand2_iter(rect: Rect<f32>) -> impl Iterator<Item = [f32; 2]> + FusedIterator + Clone {
+    rand_iter(rect.x.start, rect.x.end)
+        .zip(rand_iter(rect.y.start, rect.y.end))
+        .map(|(x, y)| [x, y])
 }
 
-pub fn rand_iter(min:f32,max:f32)->impl Iterator<Item=f32>+FusedIterator+Clone{
-    let mut rng=rand::thread_rng();
+pub fn rand_iter(min: f32, max: f32) -> impl Iterator<Item = f32> + FusedIterator + Clone {
+    let mut rng = rand::thread_rng();
 
-    core::iter::repeat_with(move ||{
-        min+rng.gen::<f32>()*(max-min)
-    })
+    core::iter::repeat_with(move || min + rng.gen::<f32>() * (max - min))
 }
-
-
 
 ///Randomly generates radiuses.
 pub struct RadiusGen {
@@ -147,10 +170,7 @@ pub struct RadiusGen {
     rng: ThreadRng,
 }
 impl RadiusGen {
-    #[deprecated(
-        since = "0.3.1",
-        note = "use rand_iter() instead"
-    )]
+    #[deprecated(since = "0.3.1", note = "use rand_iter() instead")]
     pub fn new(min_radius: Vec2<f32>, max_radius: Vec2<f32>) -> RadiusGen {
         let rng = rand::thread_rng();
         RadiusGen {
